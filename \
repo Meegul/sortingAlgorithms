@@ -3,7 +3,6 @@
 #include <time.h>
 #include <string.h>
 #include "mergeSort.h"
-
 /*
 * Function that creates and returns a new randomized int array of the specified size
 */
@@ -11,7 +10,7 @@ int* newArray(size_t size) {
         int *array = (int *) malloc(size *sizeof(int));
         int on;
         srand((unsigned)time(NULL));
-	for (on = 0; on < size; on++) {
+	for (on = 0; on < 1000; on++) {
                 array[on] = rand() % (size*10); //generates a random number between 0-(size*10)
         }
         return array;
@@ -40,7 +39,8 @@ void printArray(int* array, size_t size) {
 * The infamous bogosort
 * Randomly sorts an array, and repeats if that didn't sort it
 */
-void bogoSort(int *array, size_t size, int* trackers) {
+int* bogoSort(int *array, size_t size) {
+	int* trackers = malloc(2*sizeof(int));
 	int done = size - 1; //used to keep loop going until it reaches 0
 	int x;
 	int random;
@@ -54,7 +54,7 @@ void bogoSort(int *array, size_t size, int* trackers) {
 			temp = array[random];
 			array[random] = array[x];
 			array[x] = temp;
-			trackers[1] += 4;
+			trakcers[1] += 4;
 		}
 		//checks if array is in order
 		for (x = 0; x < size - 1; x++) { 	
@@ -64,12 +64,14 @@ void bogoSort(int *array, size_t size, int* trackers) {
 			trackers[0]++;
 		}
 	}
+	return trackers;
 }
 
 /*
 * Sorts an array using the bubble sort method
 */
-void bubbleSort(int *array, size_t size, int* trackers) {
+int* bubbleSort(int *array, size_t size) {
+	int* trackers = malloc(2*sizeof(int));
 	int x;
 	int temp;
 	int swaps = 1;
@@ -87,21 +89,24 @@ void bubbleSort(int *array, size_t size, int* trackers) {
 			trackers[1] += 2;
 		}
 	}
+	return trackers;
 }
 
 /*
-* uses mergesort to sort an array
+*
 */
-void mergeSort(int* array, size_t size, int* trackers) {
+int* mergeSort(int* array, size_t size) {
+	int* trackers = malloc(2*sizeof(int)); //[0] holds comparisons, [1] holds array accesses
 	split(array, size, trackers);	
+	return trackers;
 }
 
 int main(int argc, char **argv) {
 	size_t size;
-	int* trackers = (int*) calloc(2, sizeof(int)); //[0] holds comparisons, [1] holds array accesses
+	int* trackers;
 	//ensures that there are 2 arguments
 	if (argc != 3) {
-	printf("Usage: sortit [size to sort] [algorithm(bogo, bubble, or merge)]\n");
+	printf("Usage: sortit [size to sort] [algorithm(bogo or bubble)]\n");
 	return 1;
 	}
 	size = atoi(argv[1]); //sets size to the second argument passed
@@ -112,17 +117,15 @@ int main(int argc, char **argv) {
 	char *selection = argv[2];
 	//runs the appropriate sort
 	if (strcmp(selection, "bogo") == 0)
-		bogoSort(array, size, trackers);
+		trackers = array = bogoSort(array, size);
 	else if (strcmp(selection, "bubble") == 0)
-		bubbleSort(array, size, trackers);
+		trackers = array = bubbleSort(array, size);
 	else if (strcmp(selection, "merge") == 0)
-		mergeSort(array, size, trackers);
+		trackers = mergeSort(array, size);
 	else printf("Usage: sortit [size to sort] [algorithm(bogo or bubble)]\n");
 	//prints off the sorted array
 	printf("Sorted array:\n");
 	printArray(array, size);
 	printf("Comparisons: %d, Array Accesses: %d\n", trackers[0], trackers[1]);
-	free(trackers);
-	free(array);
 	return 0;
 }
