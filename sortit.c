@@ -26,7 +26,7 @@ void printArray(int* array, size_t size) {
         printf("[");
 	for (x = 0; x < size; x++) {
                 //moves to next line if there are 5 values displayed
-		if (numInRow == 5) {
+		if (numInRow == 10) {
                         printf("\n ");
                         numInRow = 0;
                 }
@@ -39,6 +39,12 @@ void printArray(int* array, size_t size) {
 /*
 * The infamous bogosort
 * Randomly sorts an array, and repeats if that didn't sort it
+*
+* The 'done' variable ensures that the while loop doesn't end
+* until the array is sorted. It gets reset every loop, and gets
+* decremented every time a value is found to be in order, ensuring
+* the loop doesn't finish until all values are found to be in order.
+*
 */
 void bogoSort(int *array, size_t size, int* trackers) {
 	int done = size - 1; //used to keep loop going until it reaches 0
@@ -46,8 +52,8 @@ void bogoSort(int *array, size_t size, int* trackers) {
 	int random;
 	int temp;
 	srand((unsigned)time(NULL)); //sets random() to use the current time as a seed
-	while (done) {
-		done = size - 1; //resets the done counter
+	while (done) { //will finish if done gets decremented to 0
+		done = size - 1; //resets the done counter every loop
 		//shuffles array
 		for (x = 0; x < size; x++) {
 			random = rand() % size;		
@@ -104,7 +110,12 @@ int main(int argc, char **argv) {
 	printf("Usage: sortit [size to sort] [algorithm(bogo, bubble, or merge)]\n");
 	return 1;
 	}
+	
 	size = atoi(argv[1]); //sets size to the second argument passed
+	if (size < 1) {	
+		printf("Usage: sortit [size to sort] [algorithm(bogo, bubble, or merge)]\n");
+	return 1;
+	}
 	int *array = newArray(size);
 	//prints the initial array
 	printf("Initial array:\n");
@@ -117,7 +128,10 @@ int main(int argc, char **argv) {
 		bubbleSort(array, size, trackers);
 	else if (strcmp(selection, "merge") == 0)
 		mergeSort(array, size, trackers);
-	else printf("Usage: sortit [size to sort] [algorithm(bogo or bubble)]\n");
+	else {
+		printf("Usage: sortit [size to sort] [algorithm(bogo, bubble, or merge)]\n");
+		return 1;
+	}
 	//prints off the sorted array
 	printf("Sorted array:\n");
 	printArray(array, size);
